@@ -9,7 +9,7 @@ interface numButtonProps {
 
 export default function NumButton(props: numButtonProps) {
     return (
-        <Button variant="contained" >
+        <Button fullWidth variant="contained" >
             {props.display}
         </Button >
     );

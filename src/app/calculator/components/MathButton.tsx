@@ -1,5 +1,6 @@
 import { Button } from "@mui/material";
 
+//todo: Make this  more defined. We're going to need to make hooks/functions based off this stuff
 interface mathButtonProps {
     display: string
 
@@ -9,7 +10,7 @@ interface mathButtonProps {
 
 export default function MathButton(props: mathButtonProps) {
     return (
-        <Button variant="contained" >
+        <Button fullWidth variant="contained" >
             {props.display}
         </Button >
     );
