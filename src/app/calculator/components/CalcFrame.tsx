@@ -40,8 +40,9 @@ export default function CalcFrame() {
 
     type CalcState = {
         displayValue: string,
-        calculation?: string | null
-        savedValue?: number | null
+        savedValue?: number
+        hasEqualBeenPushed: boolean
+        currentOperation: MathOperations
         //We could store history or something but let's keep it simple
         /*
         Ok I'm going to have to add a few things
@@ -60,7 +61,7 @@ export default function CalcFrame() {
 
     const defaultCalcState: CalcState = {
         displayValue: '0',
-        savedValue: null,
+        hasEqualBeenPushed: true
 
     };
 
@@ -69,8 +70,9 @@ export default function CalcFrame() {
         switch (action.type) {
             case DispatchTypes.Num:
                 let newValString;
-                if (calcState.displayValue === '0') {
+                if (calcState.hasEqualBeenPushed) {
                     newValString = action.payload
+
                 }
                 else {
                     if (action.payload == '.'! && calcState.displayValue.includes('.')!) {
@@ -86,6 +88,7 @@ export default function CalcFrame() {
             case DispatchTypes.Clear:
                 return (defaultCalcState);
             case DispatchTypes.Math:
+                const displayAsNum = parseFloat(calcState.displayValue);
                 switch (action.payload) { //MathOperations types
                     case MathOperations.Inv:
                         const toInvert = parseFloat(calcState.displayValue) * -1;
@@ -93,6 +96,27 @@ export default function CalcFrame() {
                             ...calcState,
                             displayValue: toInvert.toString()
                         });
+                    case MathOperations.Add:
+                        return ({
+                            ...calcState,
+                            savedValue: displayAsNum,
+                            currentOperation: MathOperations.Add
+                        });
+                    case MathOperations.Eql:
+                        if (calcState.currentOperation == null || calcState.savedValue === undefined) {
+                            return (defaultCalcState);
+                        }
+                        if (calcState.currentOperation == MathOperations.Add) {
+                            let total = displayAsNum + calcState.savedValue;
+                            return ({
+                                ...calcState,
+                                savedValue: total,
+                                displayValue: total.toString()
+                            })
+
+                        }
+
+
                 }
             default:
                 return calcState;
