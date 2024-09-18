@@ -21,7 +21,13 @@ export default function CalcFrame() {
     enum DispatchTypes {
         Num = "number",
         Math = "math",
-        Clear = "clear"
+        Clear = "clear",
+        Percent = "percent"
+    }
+
+    type MathDispatch = {
+        "type": DispatchTypes.Math,
+        "payload": MathOperations
     }
 
 
@@ -30,19 +36,19 @@ export default function CalcFrame() {
             "type": DispatchTypes.Num,
             "payload": string
         }
-        | {
-            "type": DispatchTypes.Math,
-            "payload": MathOperations
+        | MathDispatch |
+        {
+            "type": DispatchTypes.Clear
         } |
         {
-            "type": "clear"
+            "type": DispatchTypes.Percent
         };
 
     type CalcState = {
         displayValue: string,
         savedValue?: number
         hasEqualBeenPushed: boolean
-        currentOperation: MathOperations
+        currentOperation?: MathOperations
         //We could store history or something but let's keep it simple
         /*
         Ok I'm going to have to add a few things
@@ -66,12 +72,17 @@ export default function CalcFrame() {
     };
 
 
-    function reducer(calcState: CalcState, action: CalcAction) {
+    function reducer(calcState: CalcState, action: CalcAction): CalcState {
         switch (action.type) {
             case DispatchTypes.Num:
                 let newValString;
                 if (calcState.hasEqualBeenPushed) {
                     newValString = action.payload
+                    return ({
+                        ...calcState,
+                        displayValue: newValString,
+                        hasEqualBeenPushed: false
+                    })
 
                 }
                 else {
@@ -102,6 +113,24 @@ export default function CalcFrame() {
                             savedValue: displayAsNum,
                             currentOperation: MathOperations.Add
                         });
+                    case MathOperations.Sub:
+                        return ({
+                            ...calcState,
+                            savedValue: displayAsNum,
+                            currentOperation: MathOperations.Sub
+                        });
+                    case MathOperations.Mult:
+                        return ({
+                            ...calcState,
+                            savedValue: displayAsNum,
+                            currentOperation: MathOperations.Mult
+                        })
+                    case MathOperations.Div:
+                        return ({
+                            ...calcState,
+                            savedValue: displayAsNum,
+                            currentOperation: MathOperations.Div
+                        })
                     case MathOperations.Eql:
                         if (calcState.currentOperation == null || calcState.savedValue === undefined) {
                             return (defaultCalcState);
@@ -113,7 +142,14 @@ export default function CalcFrame() {
                                 savedValue: total,
                                 displayValue: total.toString()
                             })
-
+                        }
+                        else if (calcState.currentOperation == MathOperations.Sub) {
+                            let sub = calcState.savedValue - displayAsNum;
+                            return ({
+                                ...calcState,
+                                savedValue: sub,
+                                displayValue: sub.toString()
+                            })
                         }
 
 
@@ -150,9 +186,6 @@ export default function CalcFrame() {
                 />
                 <Grid container spacing={6} columns={4}>
                     <Grid size={1}>
-                        <MathButton display={"AC"} />
-                    </Grid>
-                    <Grid size={1}>
                         <MathButton display={"Clear"} action=
                             {
                                 () => dispatch({ 'type': DispatchTypes.Clear })
@@ -176,6 +209,16 @@ export default function CalcFrame() {
                             action={
                                 () => dispatch(
                                     {
+                                        "type": DispatchTypes.Percent,
+                                    })
+                            }
+                        />
+                    </Grid>
+                    <Grid size={1}>
+                        <MathButton display={"÷"}
+                            action={
+                                () => dispatch(
+                                    {
                                         "type": DispatchTypes.Math,
                                         "payload": MathOperations.Div
                                     })
@@ -192,7 +235,7 @@ export default function CalcFrame() {
                         <NumButton display='9' action={appendNumber} />
                     </Grid>
                     <Grid size={1}>
-                        <MathButton display={"*"}
+                        <MathButton display={"X"}
                             action={
                                 () => dispatch(
                                     {
