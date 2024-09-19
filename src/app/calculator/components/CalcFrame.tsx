@@ -49,20 +49,6 @@ export default function CalcFrame() {
         savedValue?: number
         hasEqualBeenPushed: boolean
         currentOperation?: MathOperations
-        //We could store history or something but let's keep it simple
-        /*
-        Ok I'm going to have to add a few things
-        1. savedValue
-        2. register2
-        3. currentOperation
-        
-        Register1 is where we'll save the values once we have more complicated calculations
-        currentOperation will tell me what kind of math to do
-
-        Anytime a math key is used we 
-        1. If no currentOperation: move what is in the display into savedValue
-        2. If operation: perform that operation on savedValue and display and store in savedValue
-        */
     };
 
     const defaultCalcState: CalcState = {
@@ -73,10 +59,11 @@ export default function CalcFrame() {
 
 
     function reducer(calcState: CalcState, action: CalcAction): CalcState {
+        const displayAsNum = parseFloat(calcState.displayValue);
         switch (action.type) {
             case DispatchTypes.Num:
                 let newValString;
-                if (calcState.hasEqualBeenPushed) {
+                if (calcState.hasEqualBeenPushed || calcState.displayValue == '0') {
                     newValString = action.payload
                     return ({
                         ...calcState,
@@ -99,7 +86,6 @@ export default function CalcFrame() {
             case DispatchTypes.Clear:
                 return (defaultCalcState);
             case DispatchTypes.Math:
-                const displayAsNum = parseFloat(calcState.displayValue);
                 switch (action.payload) { //MathOperations types
                     case MathOperations.Inv:
                         const toInvert = parseFloat(calcState.displayValue) * -1;
@@ -111,7 +97,8 @@ export default function CalcFrame() {
                         return ({
                             ...calcState,
                             savedValue: displayAsNum,
-                            currentOperation: MathOperations.Add
+                            currentOperation: MathOperations.Add,
+                            displayValue: '0'
                         });
                     case MathOperations.Sub:
                         return ({
@@ -154,6 +141,12 @@ export default function CalcFrame() {
 
 
                 }
+            case DispatchTypes.Percent:
+                const shiftenDisplayNum = displayAsNum * .01;
+                return ({
+                    ...calcState,
+                    displayValue: shiftenDisplayNum.toString()
+                });
             default:
                 return calcState;
         }
@@ -172,137 +165,136 @@ export default function CalcFrame() {
 
     return (
         <Container>
-            <Paper elevation={1} sx={{ width: .70 }}>
-                <TextField
-                    id=""
-                    label=""
-                    value={state.displayValue}
-                    slotProps={{
-                        input: {
-                            readOnly: true
-                        },
-                    }}
+            <TextField
+                id=""
+                label=""
+                value={state.displayValue}
+                slotProps={{
+                    input: {
+                        readOnly: true
+                    },
+                }}
+                sx={{ p: 1, minWidth: .75 }}
 
-                />
-                <Grid container spacing={6} columns={4}>
-                    <Grid size={1}>
-                        <MathButton display={"Clear"} action=
-                            {
-                                () => dispatch({ 'type': DispatchTypes.Clear })
-                            }
-                        />
-                    </Grid>
-                    <Grid size={1}>
-                        <MathButton display={"+/-"}
-                            action={
-                                () => dispatch(
-                                    {
-                                        "type": DispatchTypes.Math,
-                                        "payload": MathOperations.Inv
-                                    })
-                            }
-                        />
-                    </Grid>
-
-                    <Grid size={1}>
-                        <MathButton display={"%"}
-                            action={
-                                () => dispatch(
-                                    {
-                                        "type": DispatchTypes.Percent,
-                                    })
-                            }
-                        />
-                    </Grid>
-                    <Grid size={1}>
-                        <MathButton display={"÷"}
-                            action={
-                                () => dispatch(
-                                    {
-                                        "type": DispatchTypes.Math,
-                                        "payload": MathOperations.Div
-                                    })
-                            }
-                        />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='7' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='8' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='9' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <MathButton display={"X"}
-                            action={
-                                () => dispatch(
-                                    {
-                                        "type": DispatchTypes.Math,
-                                        "payload": MathOperations.Mult
-                                    })
-                            } />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='4' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='5' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='6' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <MathButton display={"-"}
-                            action={
-                                () => dispatch(
-                                    {
-                                        "type": DispatchTypes.Math,
-                                        "payload": MathOperations.Sub
-                                    })
-                            }
-                        />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='1' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='2' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='3' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <MathButton display={"+"}
-                            action={
-                                () => dispatch(
-                                    {
-                                        "type": DispatchTypes.Math,
-                                        "payload": MathOperations.Add
-                                    })
-                            }
-                        />
-                    </Grid>
-                    <Grid size={2}>
-                        <NumButton display='0' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <NumButton display='.' action={appendNumber} />
-                    </Grid>
-                    <Grid size={1}>
-                        <MathButton display={"="}
-                            action={
-                                () => dispatch(
-                                    {
-                                        "type": DispatchTypes.Math,
-                                        "payload": MathOperations.Eql
-                                    })
-                            }
-                        />
-                    </Grid>
+            />
+            <Grid container spacing={6} columns={4}>
+                <Grid size={1}>
+                    <MathButton display={"Clear"} action=
+                        {
+                            () => dispatch({ 'type': DispatchTypes.Clear })
+                        }
+                    />
                 </Grid>
-            </Paper >
+                <Grid size={1}>
+                    <MathButton display={"+/-"}
+                        action={
+                            () => dispatch(
+                                {
+                                    "type": DispatchTypes.Math,
+                                    "payload": MathOperations.Inv
+                                })
+                        }
+                    />
+                </Grid>
+
+                <Grid size={1}>
+                    <MathButton display={"%"}
+                        action={
+                            () => dispatch(
+                                {
+                                    "type": DispatchTypes.Percent,
+                                })
+                        }
+                    />
+                </Grid>
+                <Grid size={1}>
+                    <MathButton display={"÷"}
+                        action={
+                            () => dispatch(
+                                {
+                                    "type": DispatchTypes.Math,
+                                    "payload": MathOperations.Div
+                                })
+                        }
+                    />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='7' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='8' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='9' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <MathButton display={"X"}
+                        action={
+                            () => dispatch(
+                                {
+                                    "type": DispatchTypes.Math,
+                                    "payload": MathOperations.Mult
+                                })
+                        } />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='4' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='5' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='6' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <MathButton display={"-"}
+                        action={
+                            () => dispatch(
+                                {
+                                    "type": DispatchTypes.Math,
+                                    "payload": MathOperations.Sub
+                                })
+                        }
+                    />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='1' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='2' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='3' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <MathButton display={"+"}
+                        action={
+                            () => dispatch(
+                                {
+                                    "type": DispatchTypes.Math,
+                                    "payload": MathOperations.Add
+                                })
+                        }
+                    />
+                </Grid>
+                <Grid size={2}>
+                    <NumButton display='0' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <NumButton display='.' action={appendNumber} />
+                </Grid>
+                <Grid size={1}>
+                    <MathButton display={"="}
+                        action={
+                            () => dispatch(
+                                {
+                                    "type": DispatchTypes.Math,
+                                    "payload": MathOperations.Eql
+                                })
+                        }
+                    />
+                </Grid>
+            </Grid>
         </Container >
     );
 

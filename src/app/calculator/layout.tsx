@@ -15,15 +15,9 @@ export default function CalculatorLayout({ children }: Readonly<{ children: Reac
     return (
         <Container>
             <CssBaseline />
-
             <Paper sx={{ m: 2 }}>
-                <Typography variant="h1">Welcome to my attempt at a calculator</Typography>
                 <div> {children}</div>
-
-                <CalcFrame />
             </Paper>
-
-
         </Container>
     );
 }
