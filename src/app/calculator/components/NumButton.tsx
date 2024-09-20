@@ -1,8 +1,11 @@
-import { Button } from "@mui/material";
+import {
+    Button,
+    ButtonProps as MuiButtonProps
+} from "@mui/material";
 
-interface numButtonProps {
+interface numButtonProps extends MuiButtonProps {
     display: string
-    action: (val: string) => void,
+    onClickAction: (val: string) => void,
 
 }
 
@@ -11,7 +14,7 @@ interface numButtonProps {
 export default function NumButton(props: numButtonProps) {
 
     return (
-        <Button fullWidth variant="contained" onClick={() => { props.action(props.display) }}>
+        <Button {...props} fullWidth variant="contained" onClick={() => { props.onClickAction(props.display) }}>
             {props.display}
         </Button >
     );

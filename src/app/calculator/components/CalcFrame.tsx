@@ -1,5 +1,5 @@
 'use client'
-import { Container, Paper, TextField } from "@mui/material";
+import { Container, TextField } from "@mui/material";
 import Grid from '@mui/material/Grid2'
 import NumButton from "./NumButton";
 import MathButton from "./MathButton";
@@ -56,6 +56,8 @@ export default function CalcFrame() {
         hasEqualBeenPushed: true
 
     };
+
+    const [state, dispatch] = useReducer(reducer, defaultCalcState)
 
 
     function reducer(calcState: CalcState, action: CalcAction): CalcState {
@@ -123,7 +125,7 @@ export default function CalcFrame() {
                             return (defaultCalcState);
                         }
                         if (calcState.currentOperation == MathOperations.Add) {
-                            let total = displayAsNum + calcState.savedValue;
+                            const total = displayAsNum + calcState.savedValue;
                             return ({
                                 ...calcState,
                                 savedValue: total,
@@ -131,7 +133,7 @@ export default function CalcFrame() {
                             })
                         }
                         else if (calcState.currentOperation == MathOperations.Sub) {
-                            let sub = calcState.savedValue - displayAsNum;
+                            const sub = calcState.savedValue - displayAsNum;
                             return ({
                                 ...calcState,
                                 savedValue: sub,
@@ -151,10 +153,6 @@ export default function CalcFrame() {
                 return calcState;
         }
     };
-
-
-    const [state, dispatch] = useReducer(reducer, defaultCalcState)
-
 
     function appendNumber(val: string) {
         dispatch({ 'type': DispatchTypes.Num, 'payload': val });
@@ -179,7 +177,7 @@ export default function CalcFrame() {
             />
             <Grid container spacing={6} columns={4}>
                 <Grid size={1}>
-                    <MathButton display={"Clear"} action=
+                    <MathButton display={"Clear"} mathButtonAction=
                         {
                             () => dispatch({ 'type': DispatchTypes.Clear })
                         }
@@ -187,7 +185,7 @@ export default function CalcFrame() {
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"+/-"}
-                        action={
+                        mathButtonAction={
                             () => dispatch(
                                 {
                                     "type": DispatchTypes.Math,
@@ -199,7 +197,7 @@ export default function CalcFrame() {
 
                 <Grid size={1}>
                     <MathButton display={"%"}
-                        action={
+                        mathButtonAction={
                             () => dispatch(
                                 {
                                     "type": DispatchTypes.Percent,
@@ -209,7 +207,7 @@ export default function CalcFrame() {
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"÷"}
-                        action={
+                        mathButtonAction={
                             () => dispatch(
                                 {
                                     "type": DispatchTypes.Math,
@@ -219,17 +217,17 @@ export default function CalcFrame() {
                     />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='7' action={appendNumber} />
+                    <NumButton display='7' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='8' action={appendNumber} />
+                    <NumButton display='8' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='9' action={appendNumber} />
+                    <NumButton display='9' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"X"}
-                        action={
+                        mathButtonAction={
                             () => dispatch(
                                 {
                                     "type": DispatchTypes.Math,
@@ -238,17 +236,17 @@ export default function CalcFrame() {
                         } />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='4' action={appendNumber} />
+                    <NumButton display='4' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='5' action={appendNumber} />
+                    <NumButton display='5' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='6' action={appendNumber} />
+                    <NumButton display='6' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"-"}
-                        action={
+                        mathButtonAction={
                             () => dispatch(
                                 {
                                     "type": DispatchTypes.Math,
@@ -258,17 +256,17 @@ export default function CalcFrame() {
                     />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='1' action={appendNumber} />
+                    <NumButton display='1' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='2' action={appendNumber} />
+                    <NumButton display='2' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='3' action={appendNumber} />
+                    <NumButton display='3' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"+"}
-                        action={
+                        mathButtonAction={
                             () => dispatch(
                                 {
                                     "type": DispatchTypes.Math,
@@ -278,14 +276,14 @@ export default function CalcFrame() {
                     />
                 </Grid>
                 <Grid size={2}>
-                    <NumButton display='0' action={appendNumber} />
+                    <NumButton display='0' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='.' action={appendNumber} />
+                    <NumButton display='.' onClickAction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"="}
-                        action={
+                        mathButtonAction={
                             () => dispatch(
                                 {
                                     "type": DispatchTypes.Math,
