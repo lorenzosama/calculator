@@ -14,7 +14,11 @@ interface numButtonProps extends MuiButtonProps {
 export default function NumButton(props: numButtonProps) {
 
     return (
-        <Button {...props} fullWidth variant="contained" onClick={() => { props.onClickAction(props.display) }}>
+        <Button fullWidth variant="contained"
+            aria-label={'num-' + props.display}
+            onClick={() => { props.onClickAction(props.display) }}
+            {...props}
+        >
             {props.display}
         </Button >
     );

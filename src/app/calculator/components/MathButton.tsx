@@ -15,6 +15,7 @@ export default function MathButton(props: mathButtonProps) {
     return (
         <Button fullWidth variant="contained"
             onClick={props.mathButtonAction}
+            aria-label={'calc-' + props.display}
         >
             {props.display}
         </ Button >

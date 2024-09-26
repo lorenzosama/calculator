@@ -164,8 +164,7 @@ export default function CalcFrame() {
     return (
         <Container>
             <TextField
-                id=""
-                label=""
+                aria-label="calc-output"
                 value={state.displayValue}
                 slotProps={{
                     input: {
