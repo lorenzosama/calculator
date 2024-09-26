@@ -5,21 +5,22 @@ import {
 
 interface numButtonProps extends MuiButtonProps {
     display: string
-    onClickAction: (val: string) => void,
+    clickaction: (val: string) => void,
 
 }
 
-//TODO? Can I combine the diffrent buttons together into one component easily?
 
-export default function NumButton(props: numButtonProps) {
+//This is the right way of passing props while extending MUI props
+export default function NumButton({ display, clickaction, ...otherProps }: numButtonProps) { //props: numButtonProps) {
 
     return (
-        <Button fullWidth variant="contained"
-            aria-label={'num-' + props.display}
-            onClick={() => { props.onClickAction(props.display) }}
-            {...props}
+        <Button {...otherProps}
+            fullWidth variant="contained"
+            aria-label={'num-' + display}
+            onClick={() => { clickaction(display) }}
+
         >
-            {props.display}
+            {display}
         </Button >
     );
 };

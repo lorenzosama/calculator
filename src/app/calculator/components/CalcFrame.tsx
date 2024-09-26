@@ -106,19 +106,22 @@ export default function CalcFrame() {
                         return ({
                             ...calcState,
                             savedValue: displayAsNum,
-                            currentOperation: MathOperations.Sub
+                            currentOperation: MathOperations.Sub,
+                            displayValue: '0'
                         });
                     case MathOperations.Mult:
                         return ({
                             ...calcState,
                             savedValue: displayAsNum,
-                            currentOperation: MathOperations.Mult
+                            currentOperation: MathOperations.Mult,
+                            displayValue: '0'
                         })
                     case MathOperations.Div:
                         return ({
                             ...calcState,
                             savedValue: displayAsNum,
-                            currentOperation: MathOperations.Div
+                            currentOperation: MathOperations.Div,
+                            displayValue: '0'
                         })
                     case MathOperations.Eql:
                         if (calcState.currentOperation == null || calcState.savedValue === undefined) {
@@ -139,6 +142,27 @@ export default function CalcFrame() {
                                 savedValue: sub,
                                 displayValue: sub.toString()
                             })
+                        }
+                        else if (calcState.currentOperation == MathOperations.Mult) {
+                            const answer = calcState.savedValue * displayAsNum;
+                            return ({
+                                ...calcState,
+                                savedValue: answer,
+                                displayValue: answer.toString()
+                            })
+                        }
+                        else if (calcState.currentOperation == MathOperations.Div) {
+                            const answer = calcState.savedValue / displayAsNum;
+                            return ({
+                                ...calcState,
+                                savedValue: answer,
+                                displayValue: answer.toString()
+                            })
+                        }
+
+                        else {
+                            console.error("Current operation unsupported!");
+                            return ({ ...calcState });
                         }
 
 
@@ -174,7 +198,9 @@ export default function CalcFrame() {
                 sx={{ p: 1, minWidth: .75 }}
 
             />
-            <Grid container spacing={6} columns={4}>
+            <Grid container spacing={6} columns={4}
+                sx={{ m: 1 }}
+            >
                 <Grid size={1}>
                     <MathButton display={"Clear"} mathButtonAction=
                         {
@@ -216,13 +242,13 @@ export default function CalcFrame() {
                     />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='7' onClickAction={appendNumber} />
+                    <NumButton display='7' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='8' onClickAction={appendNumber} />
+                    <NumButton display='8' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='9' onClickAction={appendNumber} />
+                    <NumButton display='9' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"X"}
@@ -235,13 +261,13 @@ export default function CalcFrame() {
                         } />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='4' onClickAction={appendNumber} />
+                    <NumButton display='4' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='5' onClickAction={appendNumber} />
+                    <NumButton display='5' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='6' onClickAction={appendNumber} />
+                    <NumButton display='6' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"-"}
@@ -255,13 +281,13 @@ export default function CalcFrame() {
                     />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='1' onClickAction={appendNumber} />
+                    <NumButton display='1' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='2' onClickAction={appendNumber} />
+                    <NumButton display='2' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='3' onClickAction={appendNumber} />
+                    <NumButton display='3' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"+"}
@@ -275,10 +301,10 @@ export default function CalcFrame() {
                     />
                 </Grid>
                 <Grid size={2}>
-                    <NumButton display='0' onClickAction={appendNumber} />
+                    <NumButton display='0' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
-                    <NumButton display='.' onClickAction={appendNumber} />
+                    <NumButton display='.' clickaction={appendNumber} />
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"="}
