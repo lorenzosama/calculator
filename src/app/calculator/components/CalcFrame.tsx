@@ -187,8 +187,6 @@ export default function CalcFrame() {
     }
 
 
-
-
     return (
         <Container>
             <TextField
@@ -206,7 +204,8 @@ export default function CalcFrame() {
                 sx={{ m: 1 }}
             >
                 <Grid size={1}>
-                    <MathButton display={"Clear"} mathButtonAction=
+                    <MathButton display={"Clear"}
+                        mathButtonAction=
                         {
                             () => dispatch({ 'type': DispatchTypes.Clear })
                         }
@@ -226,6 +225,7 @@ export default function CalcFrame() {
 
                 <Grid size={1}>
                     <MathButton display={"%"}
+                        isCurrentOperation={false}
                         mathButtonAction={
                             () => dispatch(
                                 {
@@ -236,6 +236,7 @@ export default function CalcFrame() {
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"÷"}
+                        isCurrentOperation={state.currentOperation == MathOperations.Div}
                         mathButtonAction={
                             () => dispatch(
                                 {
@@ -256,6 +257,7 @@ export default function CalcFrame() {
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"X"}
+                        isCurrentOperation={state.currentOperation == MathOperations.Mult}
                         mathButtonAction={
                             () => dispatch(
                                 {
@@ -275,6 +277,7 @@ export default function CalcFrame() {
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"-"}
+                        isCurrentOperation={state.currentOperation == MathOperations.Sub}
                         mathButtonAction={
                             () => dispatch(
                                 {
@@ -295,6 +298,7 @@ export default function CalcFrame() {
                 </Grid>
                 <Grid size={1}>
                     <MathButton display={"+"}
+                        isCurrentOperation={state.currentOperation == MathOperations.Add}
                         mathButtonAction={
                             () => dispatch(
                                 {
