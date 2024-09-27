@@ -16,13 +16,15 @@ export default function CalcFrame() {
         Mult = "mult",
         Div = "div",
         Inv = "invert",
-        Eql = "equals", //the "done" function really
+        NoneSelected = "none", //used only in error situations
+
     };
     enum DispatchTypes {
         Num = "number",
         Math = "math",
         Clear = "clear",
-        Percent = "percent"
+        Percent = "percent",
+        Eql = "equals", //the "done" function really
     }
 
     type MathDispatch = {
@@ -42,18 +44,25 @@ export default function CalcFrame() {
         } |
         {
             "type": DispatchTypes.Percent
-        };
+        } |
+        {
+            "type": DispatchTypes.Eql
+        }
+        ;
 
     type CalcState = {
         displayValue: string,
-        savedValue?: number
+        runningAnswer?: number
         hasEqualBeenPushed: boolean
-        currentOperation?: MathOperations
+        currentOperation?: MathOperations,
+        lastOperand: number
     };
 
     const defaultCalcState: CalcState = {
         displayValue: '0',
-        hasEqualBeenPushed: true
+        hasEqualBeenPushed: false,
+        lastOperand: 0,
+        currentOperation: undefined
 
     };
 
@@ -61,11 +70,10 @@ export default function CalcFrame() {
 
 
     function reducer(calcState: CalcState, action: CalcAction): CalcState {
-        const displayAsNum = parseFloat(calcState.displayValue);
         switch (action.type) {
             case DispatchTypes.Num:
                 let newValString;
-                if (calcState.hasEqualBeenPushed || calcState.displayValue == '0') {
+                if (calcState.displayValue == '0') {
                     newValString = action.payload
                     return ({
                         ...calcState,
@@ -88,87 +96,83 @@ export default function CalcFrame() {
             case DispatchTypes.Clear:
                 return (defaultCalcState);
             case DispatchTypes.Math:
-                switch (action.payload) { //MathOperations types
-                    case MathOperations.Inv:
-                        const toInvert = parseFloat(calcState.displayValue) * -1;
-                        return ({
-                            ...calcState,
-                            displayValue: toInvert.toString()
-                        });
-                    case MathOperations.Add:
-                        return ({
-                            ...calcState,
-                            savedValue: displayAsNum,
-                            currentOperation: MathOperations.Add,
-                            displayValue: '0'
-                        });
-                    case MathOperations.Sub:
-                        return ({
-                            ...calcState,
-                            savedValue: displayAsNum,
-                            currentOperation: MathOperations.Sub,
-                            displayValue: '0'
-                        });
-                    case MathOperations.Mult:
-                        return ({
-                            ...calcState,
-                            savedValue: displayAsNum,
-                            currentOperation: MathOperations.Mult,
-                            displayValue: '0'
-                        })
-                    case MathOperations.Div:
-                        return ({
-                            ...calcState,
-                            savedValue: displayAsNum,
-                            currentOperation: MathOperations.Div,
-                            displayValue: '0'
-                        })
-                    case MathOperations.Eql:
-                        if (calcState.currentOperation == null || calcState.savedValue === undefined) {
-                            return (defaultCalcState);
-                        }
-                        if (calcState.currentOperation == MathOperations.Add) {
-                            const total = displayAsNum + calcState.savedValue;
-                            return ({
-                                ...calcState,
-                                savedValue: total,
-                                displayValue: total.toString()
-                            })
-                        }
-                        else if (calcState.currentOperation == MathOperations.Sub) {
-                            const sub = calcState.savedValue - displayAsNum;
-                            return ({
-                                ...calcState,
-                                savedValue: sub,
-                                displayValue: sub.toString()
-                            })
-                        }
-                        else if (calcState.currentOperation == MathOperations.Mult) {
-                            const answer = calcState.savedValue * displayAsNum;
-                            return ({
-                                ...calcState,
-                                savedValue: answer,
-                                displayValue: answer.toString()
-                            })
-                        }
-                        else if (calcState.currentOperation == MathOperations.Div) {
-                            const answer = calcState.savedValue / displayAsNum;
-                            return ({
-                                ...calcState,
-                                savedValue: answer,
-                                displayValue: answer.toString()
-                            })
-                        }
-
-                        else {
-                            console.error("Current operation unsupported!");
-                            return ({ ...calcState });
-                        }
-
+                //maybe we have if else statements here
+                if (action.payload == MathOperations.Inv) {
+                    const toInvert = parseFloat(calcState.displayValue) * -1;
+                    return ({
+                        ...calcState,
+                        displayValue: toInvert.toString(),
+                    });
+                }
+                else { //all other math actions should have shared work
+                    let currentOperation: MathOperations = MathOperations.NoneSelected;
+                    const numInDisplay: number = parseFloat(calcState.displayValue);
+                    switch (action.payload) {
+                        case MathOperations.Add:
+                            currentOperation = MathOperations.Add;
+                            break;
+                        case MathOperations.Sub:
+                            currentOperation = MathOperations.Sub;
+                            break;
+                        case MathOperations.Mult:
+                            currentOperation = MathOperations.Mult;
+                            break;
+                        case MathOperations.Div:
+                            currentOperation = MathOperations.Div;
+                            break;
+                    }
+                    return ({
+                        ...calcState,
+                        runningAnswer: numInDisplay,
+                        currentOperation: currentOperation,
+                        displayValue: '0',
+                        lastOperand: numInDisplay
+                    });
 
                 }
+            case DispatchTypes.Eql:
+                if (calcState.currentOperation == null || calcState.runningAnswer === undefined) {
+                    return (defaultCalcState);
+                }
+                //let toReturn = { ...calcState }
+                let lastOperand = calcState.lastOperand;
+                let hasEqualBeenPushed = calcState.hasEqualBeenPushed;
+
+                const displayAsNum = parseFloat(calcState.displayValue);
+                if (!hasEqualBeenPushed) {
+                    lastOperand = displayAsNum; //this ensures we don't double
+                    hasEqualBeenPushed = true;
+                }
+
+                //TODO: need to add code so total is determined 
+                //if there's a last operand. And so save the last operand.
+                //This might be a bit difficult or complex so maybe we need to 
+                //extrapolate it out
+                let runningAnswer = calcState.runningAnswer
+                switch (calcState.currentOperation) {
+                    case MathOperations.Add:
+                        runningAnswer = lastOperand + calcState.runningAnswer;
+                        break;
+                    case MathOperations.Sub:
+                        runningAnswer = calcState.runningAnswer - lastOperand;
+                        break;
+                    case MathOperations.Div:
+                        runningAnswer = calcState.runningAnswer / lastOperand;
+                        break;
+                    case MathOperations.Mult:
+                        runningAnswer = calcState.runningAnswer * lastOperand;
+                        break;
+                }
+                return ({
+                    ...calcState,
+                    hasEqualBeenPushed: hasEqualBeenPushed,
+                    lastOperand: lastOperand,
+                    runningAnswer: runningAnswer,
+                    displayValue: runningAnswer.toString(),
+                });
             case DispatchTypes.Percent:
-                const shiftenDisplayNum = displayAsNum * .01;
+                const dispAsNum = parseFloat(calcState.displayValue);
+                const shiftenDisplayNum = dispAsNum * .01;
                 return ({
                     ...calcState,
                     displayValue: shiftenDisplayNum.toString()
@@ -311,8 +315,7 @@ export default function CalcFrame() {
                         mathButtonAction={
                             () => dispatch(
                                 {
-                                    "type": DispatchTypes.Math,
-                                    "payload": MathOperations.Eql
+                                    "type": DispatchTypes.Eql,
                                 })
                         }
                     />
